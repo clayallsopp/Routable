@@ -1,18 +1,21 @@
 class UsersTestController < UIViewController
   attr_accessor :user_id
 
-  def init(params = {})
-    super()
+  def initWithParams(params = {})
+    init()
     self.user_id = params[:user_id]
     self
   end
+end
+
+class NoParamsController < UIViewController
 end
 
 describe "the url router" do
   before do
     @router = Routable::Router.new
 
-    @nav_controller = UIApplication.sharedApplication.delegate.navigation_controller
+    @nav_controller = UINavigationController.alloc.init
     @nav_controller.setViewControllers([], animated: false)
     @nav_controller.viewControllers.count.should == 0
   end
@@ -26,10 +29,17 @@ describe "the url router" do
   it "maps the correct urls" do
     make_test_controller_route
 
-    user_id = "3"
+    user_id = "1001"
     controller = @router.controller_for_url("users/#{user_id}")
     controller.class.should == UsersTestController
     controller.user_id.should == user_id
+  end
+
+  it "opens urls with no params" do
+    @router.navigation_controller = @nav_controller
+    @router.map("url", NoParamsController)
+    @router.open("url")
+    @router.navigation_controller.viewControllers.count.should == 1
   end
 
   it "opens nav controller to url" do

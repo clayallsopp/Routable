@@ -128,8 +128,14 @@ module Routable
       return shared_vc_cache[url] if shared_vc_cache[url]
 
       open_options = options_for_url(url)
+      open_params = open_options[:open_params]
       open_klass = open_options[:klass]
-      controller = open_klass.alloc.init(open_options[:open_params])
+      controller = open_klass.alloc
+      if controller.respond_to? :initWithParams
+        controller = controller.initWithParams(open_params)
+      else
+        controller = controller.init
+      end
       if open_options[:shared]
         shared_vc_cache[url] = controller
         # when controller.viewDidUnload called, remove from cache.
