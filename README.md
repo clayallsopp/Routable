@@ -12,6 +12,24 @@ A UIViewController->URL router.
 
 Why is this awesome? Because now you can push any view controller from any part of the app with just a string: buttons, push notifications, anything.
 
+## Installation
+
+```ruby
+gem install routable
+```
+
+And now in your Rakefile, require `routable`:
+
+```ruby
+$:.unshift("/Library/RubyMotion/lib")
+require 'motion/project'
+require 'routable'
+
+Motion::Project::App.setup do |app|
+  ...
+end
+```
+
 ## Setup
 
 For every UIViewController you want routable with `:symbolic` params, you need to define `.initWithParams({})`.
