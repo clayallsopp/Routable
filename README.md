@@ -42,9 +42,9 @@ class AppDelegate
 
     # .open(url, animated)
     if User.logged_in_user
-      @router.open("login", false)
-    else
       @router.open("menu", false)
+    else
+      @router.open("login", false)
     end
 
     true
