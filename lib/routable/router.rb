@@ -61,6 +61,17 @@ module Routable
       end
     end
 
+    # Pop the top level UIViewController
+    # EX
+    # router.pop
+    def pop(animated = true)
+      if self.navigation_controller.modalViewController
+        self.navigation_controller.dismissModalViewControllerAnimated(animated)
+      else
+        self.navigation_controller.popViewControllerAnimated(animated)
+      end
+    end
+
     def options_for_url(url)
       # map of url => options
 
