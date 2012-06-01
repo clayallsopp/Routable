@@ -1,10 +1,17 @@
 module Routable
   class Router
-    TRANSITIONS = {
+    TRANSITION_STYLES = {
       :cover => UIModalTransitionStyleCoverVertical,
       :flip => UIModalTransitionStyleFlipHorizontal,
       :dissolve => UIModalTransitionStyleCrossDissolve,
       :curl => UIModalTransitionStylePartialCurl
+    }
+
+    PRESENTATION_STYLES = {
+      :full_screen => UIModalPresentationFullScreen,
+      :page_sheet => UIModalPresentationPageSheet,
+      :form_sheet => UIModalPresentationFormSheet,
+      :current => UIModalPresentationCurrentContext
     }
 
     # Singleton, for practical use (you might not want)
@@ -37,11 +44,17 @@ module Routable
     #     - If URL is called again, we pop to that VC if it's in memory.
     #   :transition => [:cover, :flip, :dissolve, :curl]
     #     - A symbol to represented transition style used. Mapped to UIModalTransitionStyle.
+    #   :presentation => [:full_screen, :page_sheet, :form_sheet, :current]
+    #     - A symbol to represented presentation style used. Mapped to UIModalPresentation.
     def map(url, klass, options = {})
       format = url
 
-      if options[:transition] && !TRANSITIONS.keys.include?(options[:transition])
-        raise ArgumentError, "transition must be one of #{TRANSITIONS.keys}"
+      if options[:transition] && !TRANSITION_STYLES.keys.include?(options[:transition])
+        raise ArgumentError, ":transition must be one of #{TRANSITION_STYLES.keys}"
+      end
+
+      if options[:presentation] && !PRESENTATION_STYLES.keys.include?(options[:presentation])
+        raise ArgumentError, ":presentation must be one of #{PRESENTATION_STYLES.keys}"
       end
 
       self.routes[format] = options.merge!(klass: klass)
@@ -155,6 +168,7 @@ module Routable
       open_params = open_options[:open_params]
       open_klass = open_options[:klass]
       transition = open_options[:transition]
+      presentation = open_options[:presentation]
       controller = open_klass.alloc
       if controller.respond_to? :initWithParams
         controller = controller.initWithParams(open_params)
@@ -177,7 +191,11 @@ module Routable
       end
 
       if transition
-        controller.modalTransitionStyle = TRANSITIONS[transition]
+        controller.modalTransitionStyle = TRANSITION_STYLES[transition]
+      end
+
+      if presentation
+        controller.modalPresentationStyle = PRESENTATION_STYLES[presentation] 
       end
 
       controller
