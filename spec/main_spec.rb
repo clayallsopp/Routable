@@ -11,6 +11,9 @@ end
 class NoParamsController < UIViewController
 end
 
+class LoginController < UIViewController
+end
+
 describe "the url router" do
   before do
     @router = Routable::Router.new
@@ -68,4 +71,20 @@ describe "the url router" do
     @router.open("users")
     @nav_controller.viewControllers.count.should == 3
   end
+
+  it "should use transitions on modal" do
+    [:cover, :flip, :dissolve, :curl].each do |transition|
+      url = "login/#{transition.to_s}"
+      @router.map(url, LoginController, modal: true, transition:transition)
+      controller = @router.controller_for_url(url)
+      controller.modalTransitionStyle.should == Routable::Router::TRANSITIONS[transition]
+    end
+  end
+
+  it "should raise error when transition is unexpected value" do
+    lambda do
+      @router.map("login", LoginController, modal: true, transition: :unexpected)
+    end.should.raise(ArgumentError)
+  end
+
 end

@@ -1,5 +1,12 @@
 module Routable
   class Router
+    TRANSITIONS = {
+      :cover => UIModalTransitionStyleCoverVertical,
+      :flip => UIModalTransitionStyleFlipHorizontal,
+      :dissolve => UIModalTransitionStyleCrossDissolve,
+      :curl => UIModalTransitionStylePartialCurl
+    }
+
     # Singleton, for practical use (you might not want)
     # to have more than one router.
     class << self
@@ -28,9 +35,15 @@ module Routable
     #     - We present the VC modally (router is not shared between the new nav VC)
     #   :shared => true/false
     #     - If URL is called again, we pop to that VC if it's in memory.
-
+    #   :transition => [:cover, :flip, :dissolve, :curl]
+    #     - A symbol to represented transition style used. Mapped to UIModalTransitionStyle.
     def map(url, klass, options = {})
       format = url
+
+      if options[:transition] && !TRANSITIONS.keys.include?(options[:transition])
+        raise ArgumentError, "transition must be one of #{TRANSITIONS.keys}"
+      end
+
       self.routes[format] = options.merge!(klass: klass)
     end
 
@@ -141,12 +154,14 @@ module Routable
       open_options = options_for_url(url)
       open_params = open_options[:open_params]
       open_klass = open_options[:klass]
+      transition = open_options[:transition]
       controller = open_klass.alloc
       if controller.respond_to? :initWithParams
         controller = controller.initWithParams(open_params)
       else
         controller = controller.init
       end
+
       if open_options[:shared]
         shared_vc_cache[url] = controller
         # when controller.viewDidUnload called, remove from cache.
@@ -160,6 +175,11 @@ module Routable
           end
         end
       end
+
+      if transition
+        controller.modalTransitionStyle = TRANSITIONS[transition]
+      end
+
       controller
     end
 
@@ -168,4 +188,4 @@ module Routable
       @shared_vc_cache ||= {}
     end
   end
-end
+  end
