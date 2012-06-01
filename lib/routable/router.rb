@@ -76,6 +76,8 @@ module Routable
         else
           tempNavigationController = UINavigationController.alloc.init
           tempNavigationController.pushViewController(controller, animated: false)
+          tempNavigationController.modalTransitionStyle = controller.modalTransitionStyle
+          tempNavigationController.modalPresentationStyle = controller.modalPresentationStyle
           self.navigation_controller.presentModalViewController(tempNavigationController, animated: animated)
         end
       else
@@ -167,8 +169,6 @@ module Routable
       open_options = options_for_url(url)
       open_params = open_options[:open_params]
       open_klass = open_options[:klass]
-      transition = open_options[:transition]
-      presentation = open_options[:presentation]
       controller = open_klass.alloc
       if controller.respond_to? :initWithParams
         controller = controller.initWithParams(open_params)
@@ -190,10 +190,12 @@ module Routable
         end
       end
 
+      transition = open_options[:transition]
       if transition
         controller.modalTransitionStyle = TRANSITION_STYLES[transition]
       end
 
+      presentation = open_options[:presentation]
       if presentation
         controller.modalPresentationStyle = PRESENTATION_STYLES[presentation] 
       end
