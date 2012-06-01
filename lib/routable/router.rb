@@ -45,7 +45,7 @@ module Routable
     #   :transition => [:cover, :flip, :dissolve, :curl]
     #     - A symbol to represented transition style used. Mapped to UIModalTransitionStyle.
     #   :presentation => [:full_screen, :page_sheet, :form_sheet, :current]
-    #     - A symbol to represented presentation style used. Mapped to UIModalPresentation.
+    #     - A symbol to represented presentation style used. Mapped to UIModalPresentationStyle.
     def map(url, klass, options = {})
       format = url
 
