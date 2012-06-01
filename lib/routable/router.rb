@@ -1,5 +1,19 @@
 module Routable
   class Router
+    TRANSITION_STYLES = {
+      :cover => UIModalTransitionStyleCoverVertical,
+      :flip => UIModalTransitionStyleFlipHorizontal,
+      :dissolve => UIModalTransitionStyleCrossDissolve,
+      :curl => UIModalTransitionStylePartialCurl
+    }
+
+    PRESENTATION_STYLES = {
+      :full_screen => UIModalPresentationFullScreen,
+      :page_sheet => UIModalPresentationPageSheet,
+      :form_sheet => UIModalPresentationFormSheet,
+      :current => UIModalPresentationCurrentContext
+    }
+
     # Singleton, for practical use (you might not want)
     # to have more than one router.
     class << self
@@ -28,9 +42,21 @@ module Routable
     #     - We present the VC modally (router is not shared between the new nav VC)
     #   :shared => true/false
     #     - If URL is called again, we pop to that VC if it's in memory.
-
+    #   :transition => [:cover, :flip, :dissolve, :curl]
+    #     - A symbol to represented transition style used. Mapped to UIModalTransitionStyle.
+    #   :presentation => [:full_screen, :page_sheet, :form_sheet, :current]
+    #     - A symbol to represented presentation style used. Mapped to UIModalPresentationStyle.
     def map(url, klass, options = {})
       format = url
+
+      if options[:transition] && !TRANSITION_STYLES.keys.include?(options[:transition])
+        raise ArgumentError, ":transition must be one of #{TRANSITION_STYLES.keys}"
+      end
+
+      if options[:presentation] && !PRESENTATION_STYLES.keys.include?(options[:presentation])
+        raise ArgumentError, ":presentation must be one of #{PRESENTATION_STYLES.keys}"
+      end
+
       self.routes[format] = options.merge!(klass: klass)
     end
 
@@ -50,6 +76,8 @@ module Routable
         else
           tempNavigationController = UINavigationController.alloc.init
           tempNavigationController.pushViewController(controller, animated: false)
+          tempNavigationController.modalTransitionStyle = controller.modalTransitionStyle
+          tempNavigationController.modalPresentationStyle = controller.modalPresentationStyle
           self.navigation_controller.presentModalViewController(tempNavigationController, animated: animated)
         end
       else
@@ -147,6 +175,7 @@ module Routable
       else
         controller = controller.init
       end
+
       if open_options[:shared]
         shared_vc_cache[url] = controller
         # when controller.viewDidUnload called, remove from cache.
@@ -160,6 +189,17 @@ module Routable
           end
         end
       end
+
+      transition = open_options[:transition]
+      if transition
+        controller.modalTransitionStyle = TRANSITION_STYLES[transition]
+      end
+
+      presentation = open_options[:presentation]
+      if presentation
+        controller.modalPresentationStyle = PRESENTATION_STYLES[presentation] 
+      end
+
       controller
     end
 
