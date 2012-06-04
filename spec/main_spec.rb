@@ -11,6 +11,9 @@ end
 class NoParamsController < UIViewController
 end
 
+class LoginController < UIViewController
+end
+
 describe "the url router" do
   before do
     @router = Routable::Router.new
@@ -68,4 +71,35 @@ describe "the url router" do
     @router.open("users")
     @nav_controller.viewControllers.count.should == 3
   end
+
+  it "should use transition option" do
+    [:cover, :flip, :dissolve, :curl].each do |transition|
+      url = "login/#{transition.to_s}"
+      @router.map(url, LoginController, modal: true, transition:transition)
+      controller = @router.controller_for_url(url)
+      controller.modalTransitionStyle.should == Routable::Router::TRANSITION_STYLES[transition]
+    end
+  end
+
+  it "should raise error when transition is unexpected value" do
+    lambda do
+      @router.map("login", LoginController, modal: true, transition: :unexpected)
+    end.should.raise(ArgumentError)
+  end
+
+  it "should use presentation option" do
+    [:full_screen, :page_sheet, :form_sheet, :current].each do |presentation|
+      url = "login/#{presentation.to_s}"
+      @router.map(url, LoginController, modal: true, presentation:presentation)
+      controller = @router.controller_for_url(url)
+      controller.modalPresentationStyle.should == Routable::Router::PRESENTATION_STYLES[presentation]
+    end
+  end
+
+  it "should raise error when presentation is unexpected value" do
+    lambda do
+      @router.map("login", LoginController, modal: true, presentation: :unexpected)
+    end.should.raise(ArgumentError)
+  end
+
 end
