@@ -178,18 +178,6 @@ module Routable
 
       if open_options[:shared]
         shared_vc_cache[url] = controller
-        # when controller.viewDidUnload called, remove from cache.
-        controller.class.class_eval do
-          define_method(:new_dealloc) do
-            shared_vc_cache.delete url
-          end
-        end
-        controller.instance_eval do
-          def viewDidUnload
-            new_dealloc
-            super
-          end
-        end
       end
 
       transition = open_options[:transition]
