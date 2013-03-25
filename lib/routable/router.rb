@@ -77,7 +77,14 @@ module Routable
       controller_options = options_for_url(url)
 
       if controller_options[:callback]
-        controller_options[:callback].call
+        params = controller_options[:open_params]
+        callback = controller_options[:callback]
+        case callback.arity
+        when 0
+          callback.call
+        when 1
+          callback.call(params)
+        end
         return
       end
 

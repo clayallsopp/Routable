@@ -111,4 +111,14 @@ describe "the url router" do
     @router.open("logout")
     @called.should == true
   end
+
+  it "should work with callback blocks & params" do
+    @called = false
+    @router.map("logout/:id") do |params|
+      @called = params[:id]
+    end
+
+    @router.open("logout/123")
+    @called.should == "123"
+  end
 end

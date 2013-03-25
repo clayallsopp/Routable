@@ -85,6 +85,9 @@ class AppDelegate
     @router.map("logout") do
       User.logout
     end
+    @router.map("logout/:id") do |params|
+      User.logout(params[:id])
+    end
 
     @window.rootViewController = @router.navigation_controller
   end
