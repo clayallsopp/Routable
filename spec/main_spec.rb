@@ -102,4 +102,13 @@ describe "the url router" do
     end.should.raise(ArgumentError)
   end
 
+  it "should work with callback blocks" do
+    @called = false
+    @router.map("logout") do
+      @called = true
+    end
+
+    @router.open("logout")
+    @called.should == true
+  end
 end

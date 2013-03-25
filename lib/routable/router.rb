@@ -37,6 +37,11 @@ module Routable
     # Map a URL to a UIViewController
     # EX
     # router.map "/users/:id", UsersController
+    # PARAMS
+    #   url => the URL to map
+    #   klass (optional) => the UIViewController class to open
+    #   options (optional) => hash of options
+    #   &callback => the block to be run when opening the URL
     # OPTIONS
     #   :modal => true/false
     #     - We present the VC modally (router is not shared between the new nav VC)
@@ -46,8 +51,12 @@ module Routable
     #     - A symbol to represented transition style used. Mapped to UIModalTransitionStyle.
     #   :presentation => [:full_screen, :page_sheet, :form_sheet, :current]
     #     - A symbol to represented presentation style used. Mapped to UIModalPresentationStyle.
-    def map(url, klass, options = {})
+    def map(url, klass = nil, options = {}, &callback)
       format = url
+
+      if callback
+        self.routes[format] = options.merge!(callback: callback)
+      end
 
       if options[:transition] && !TRANSITION_STYLES.keys.include?(options[:transition])
         raise ArgumentError, ":transition must be one of #{TRANSITION_STYLES.keys}"
@@ -66,6 +75,12 @@ module Routable
     # => router.navigation_controller pushes a UsersController
     def open(url, animated = true)
       controller_options = options_for_url(url)
+
+      if controller_options[:callback]
+        controller_options[:callback].call
+        return
+      end
+
       controller = controller_for_url(url)
       if self.navigation_controller.modalViewController
         self.navigation_controller.dismissModalViewControllerAnimated(animated)
@@ -205,7 +220,6 @@ module Routable
       controller
     end
 
-    private
     def shared_vc_cache
       @shared_vc_cache ||= {}
     end

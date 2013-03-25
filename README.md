@@ -81,6 +81,11 @@ class AppDelegate
     @router.map("messages", MessagesController)
     @router.map("message/:id", MessageThreadController)
 
+    # can also route arbitrary blocks of code
+    @router.map("logout") do
+      User.logout
+    end
+
     @window.rootViewController = @router.navigation_controller
   end
 end
