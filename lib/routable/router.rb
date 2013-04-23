@@ -69,6 +69,14 @@ module Routable
       self.routes[format] = options.merge!(klass: klass)
     end
 
+    # Open the given URL via the iOS protocol
+    # EX
+    # router.open_external("http://google.com")
+    # => Opens Google in Safari.app
+    def open_external(url)
+      UIApplication.sharedApplication.openURL(NSURL.URLWithString(url))
+    end
+
     # Push the UIViewController for the given url
     # EX
     # router.open("users/3")
