@@ -98,7 +98,15 @@ module Routable
 
       controller = controller_for_url(url)
       if self.navigation_controller.modalViewController
-        self.navigation_controller.dismissModalViewControllerAnimated(animated)
+        dismiss_animated = animated
+
+        # Can't dismiss and present two controllers animated at the same time,
+        # so we just dismiss the current one without an animation
+        if controller_options[:modal] && dismiss_animated
+          dismiss_animated = false
+        end
+
+        self.navigation_controller.dismissModalViewControllerAnimated(dismiss_animated)
       end
       if controller_options[:modal]
         if controller.class == UINavigationController
