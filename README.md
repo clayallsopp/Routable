@@ -74,11 +74,14 @@ class AppDelegate
 
     # :modal means we push it modally.
     @router.map("login", LoginController, modal: true)
+
     # :shared means it will only keep one instance of this VC in the hierarchy;
     # if we push it again later, it will pop any covering VCs.
     @router.map("menu", MenuController, shared: true)
     @router.map("profile/:id", ProfileController)
-    @router.map("messages", MessagesController)
+
+    # :resets will reset the navigation stack with the target view controller
+    @router.map("messages", MessagesController, resets: true)
     @router.map("message/:id", MessageThreadController)
 
     # can also route arbitrary blocks of code
