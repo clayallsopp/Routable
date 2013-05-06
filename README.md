@@ -96,3 +96,16 @@ class AppDelegate
   end
 end
 ```
+
+## Configuration of View Controllers
+
+If you need to configure a view controller before the router navigates to it, use a block:
+
+``` ruby
+# Configure and push an ImageEditorController
+BW::Device.camera.any.picture(media_types: [:movie, :image]) do |result|
+  router.open('editor') do |controller|
+    controller.image = result[:original_image]
+  end
+end
+```
