@@ -47,6 +47,8 @@ module Routable
     #     - We present the VC modally (router is not shared between the new nav VC)
     #   :shared => true/false
     #     - If URL is called again, we pop to that VC if it's in memory.
+    #   :resets => true/false
+    #     - Resets the navigation stack with the target view controller
     #   :transition => [:cover, :flip, :dissolve, :curl]
     #     - A symbol to represented transition style used. Mapped to UIModalTransitionStyle.
     #   :presentation => [:full_screen, :page_sheet, :form_sheet, :current]
@@ -108,7 +110,10 @@ module Routable
 
         self.navigation_controller.dismissModalViewControllerAnimated(dismiss_animated)
       end
-      if controller_options[:modal]
+
+      if controller_options[:resets]
+        navigation_controller.setViewControllers([controller], animated: animated)
+      elsif controller_options[:modal]
         if controller.class == UINavigationController
           self.navigation_controller.presentModalViewController(controller, animated: animated)
         else
