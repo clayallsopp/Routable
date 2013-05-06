@@ -121,4 +121,17 @@ describe "the url router" do
     @router.open("logout/123")
     @called.should == "123"
   end
+
+  describe 'reset option' do
+    it 'resets the navigation controller stack with the target controller' do
+      @router.navigation_controller = @nav_controller
+      @router.map('start', NoParamsController)
+      @router.map('reset', NoParamsController, resets: true)
+
+      @router.open('start')
+      @router.open('reset')
+
+      @router.navigation_controller.viewControllers.count.should == 1
+    end
+  end
 end
