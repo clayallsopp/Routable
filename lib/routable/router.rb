@@ -83,7 +83,7 @@ module Routable
     # EX
     # router.open("users/3")
     # => router.navigation_controller pushes a UsersController
-    def open(url, animated = true)
+    def open(url, animated = true, &block)
       controller_options = options_for_url(url)
 
       if controller_options[:callback]
@@ -99,6 +99,13 @@ module Routable
       end
 
       controller = controller_for_url(url)
+
+      # Allow configuration of the view controller after
+      # initialization but before navigating to the view controller
+      if block_given?
+        block.call(controller)
+      end
+
       if self.navigation_controller.modalViewController
         dismiss_animated = animated
 

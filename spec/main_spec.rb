@@ -14,6 +14,16 @@ end
 class LoginController < UIViewController
 end
 
+class ConfigurableController < UIViewController
+  attr_accessor :configured
+
+  def init
+    super.tap do |controller|
+      controller.configured = false
+    end
+  end
+end
+
 describe "the url router" do
   before do
     @router = Routable::Router.new
@@ -21,6 +31,21 @@ describe "the url router" do
     @nav_controller = UINavigationController.alloc.init
     @nav_controller.setViewControllers([], animated: false)
     @nav_controller.viewControllers.count.should == 0
+  end
+
+  describe '#open' do
+    it 'accepts a configuration block' do
+      url = 'configured'
+      @router.navigation_controller = @nav_controller
+      @router.map(url, ConfigurableController, shared: true)
+
+      @router.open(url) do |controller|
+        controller.configured = true
+      end
+
+      controller = @router.controller_for_url(url)
+      controller.configured.should.be.true
+    end
   end
 
   def make_test_controller_route
